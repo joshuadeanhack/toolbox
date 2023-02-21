@@ -9,13 +9,13 @@ import json
 
 # Get the file path from the environment variable
 current_dir = os.getcwd()
-file_path = os.environ.get('build.version.filepath') or f"{current_dir}\filepath\Build.version"
+file_path = sys.argv[1] or os.environ.get('build.version.filepath') or f"{current_dir}\filepath\Build.version"
 
 # Get the key of the JSON to be modified
-key = sys.argv[1] or 'Changelist'
+key = sys.argv[2] or 'Changelist'
 
 # Get the new value from the environment variable
-changelist_number = sys.argv[2] or os.environ.get('build.vcs.number') or "0"
+changelist_number = sys.argv[3] or os.environ.get('build.vcs.number') or "0"
 
 try:
     # Open the JSON file and load its contents into a dictionary
