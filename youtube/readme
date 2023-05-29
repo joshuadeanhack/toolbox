@@ -1,11 +1,4 @@
 
 Prereqs:
 
-Src - https://developers.google.com/youtube/v3/quickstart/python
-
-pip install --upgrade google-api-python-client
-pip install --upgrade google-auth-oauthlib google-auth-httplib2
-
-YouTube API Key
-YouTube OAuth2.0 Client ID
-  from https://console.cloud.google.com/ 
+yt-dlp.exe installed and accessible through the system path
