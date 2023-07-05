@@ -1,0 +1,6 @@
+config:
+  Cogito-Nginx:containerPort: "80"
+  Cogito-Nginx:cpu: "512"
+  Cogito-Nginx:memory: "256"
+  aws:profile: pulumi
+  aws:region: eu-west-1

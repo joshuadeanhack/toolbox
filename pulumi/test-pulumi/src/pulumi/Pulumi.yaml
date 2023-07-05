@@ -1,0 +1,6 @@
+name: Cogito-Nginx
+description: Self-Deloying Nginx Container on AWS Fargate
+runtime:
+    name: python
+    options:
+        virtualenv: venv
