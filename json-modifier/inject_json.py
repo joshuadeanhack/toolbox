@@ -37,34 +37,23 @@ def load_args():
 class JSONData:
     # Path to json file
     file_path: str = None
-
-    # Dictionary of key-values to set
-    modifications: dict = None
-
-    # Dictionary for original JSON file
+    
+    # Dictionary for JSON file
     data: dict = None
 
     # Loads JSON data from the file path
-    def load_data_from_file(self) -> None:
+    def load(self) -> None:
         with open(self.file_path, 'r') as f:
             self.data = json.load(f)
             print(f"Opened the file: {self.file_path}")
 
-    # Sets the modifications dictionary based on the --modify args specified.
-    def set_modifications_from_args(self, args) -> None:
-        if args.modify:
-            self.modifications = {key: value for key, value in args.modify}
-        else:
-            self.modifications = {}
-
-    # Modify the JSON object data values, using the modifications dict.
-    def apply_JSON_modifications(self) -> None:
-        for key, value in self.modifications.items():
-            self.data[key] = cast_integer(value)
-            print(f"Modifying {key}: {value}")
+    # Modify a JSON key value pair
+    def update(self, key, value) -> None:
+        self.data[key] = cast_integer(value)
+        print(f"Modifying JSON Data -> {key}: {value}")
 
     # Writes the data to a JSON file at the file_path
-    def write_data_to_file(self) -> None:  
+    def write(self) -> None:  
         try:
             with open(self.file_path, 'w') as f:
                 json.dump(self.data, f, indent='\t')
@@ -74,44 +63,40 @@ class JSONData:
             print(e)
             sys.exit(1)
 
-    # Print the JSON file on disk to STD_OUT
-    def print_file_on_disk(self) -> None:
-        self.data = {}
-        self.load_data_from_file()
-        print(f"File on Disk: {self.file_path}")
+    # Print the JSON file
+    def print(self) -> None:
         print(json.dumps(self.data, indent=4))
 
 try:
-    JSON_data = JSONData()
-
-    # Load CLI arguments
+    JSON = JSONData()
     args = load_args()
 
     # Set the file path to the JSON file
-    JSON_data.file_path = args.file
+    JSON.file_path = args.file
 
     # Load the JSON file
-    JSON_data.load_data_from_file()
+    JSON.load()
 
-    # Create the dictionary of modifications from the CLI arguments 
-    JSON_data.set_modifications_from_args(args)
+    # Modify the JSON data
+    for key, value in args.modify:
+        JSON.update(key, value)
 
-    # Modify the data dict, based on the modifications dict 
-    JSON_data.apply_JSON_modifications()
-
-    # Write modifications to file
-    JSON_data.write_data_to_file()
+    # Write the new JSON file
+    JSON.write()
 
     # Print the new file on disk 
-    print("\nChecking file on disk...")
-    JSON_data.print_file_on_disk()
+    print(f"\nChecking File on Disk...")
+    JSON.data = {}
+    JSON.load()
+    JSON.print()
 
 except FileNotFoundError as e:
-    print(f"Could not open the Build.version file: {JSON_data.file_path} not found")
+    print(f"Could not open the Build.version file: {JSON.file_path} not found")
     print(f"Error: {str(e)}")
     sys.exit(1)
 except json.JSONDecodeError as e:
-    print(f"Failed to decode JSON file {JSON_data.file_path}")
+    print(f"Failed to decode JSON file {JSON.file_path}")
+    print("Is the JSON invalid?")
     print(f"Error: {str(e)}")
     sys.exit(1)
 except Exception as e:
