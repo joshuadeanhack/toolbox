@@ -31,7 +31,7 @@
 #           - 
 
 from dataclasses import dataclass
-from typing import List
+from collections import deque
 
 @dataclass 
 class Note():
@@ -39,18 +39,48 @@ class Note():
     octave: int = 1
 
 class NoteSequence():
-    Notes: List[Note] = []
+    notes = deque() 
 
+    # Add a note to the end of the seqeunce
     def add(self, note: Note) -> None:
-        self.Notes.append(note)
+        self.notes.append(note)
 
+    # Remove a note at a given index
+    def remove(self, index: int) -> None:
+        if 0 <= index < len(self.notes):
+            self.notes.remove(index)
+
+    # Remove the last note
+    def pop(self) -> None:
+        self.notes.pop()
+
+    # Reverse the note sequence
+    def reverse(self) -> None:
+        self.notes.reverse()
+
+    # Rotate the note sequence by a given transformation number
+    def rotate(self, transform: int) -> None:
+        self.notes.rotate(transform)
+
+    # Print the notes
     def print(self) -> None:
-        for note in self.Notes:
-            print(note.value, note.octave)
+        print("Notes: ", end="")
+        for note in self.notes:
+            print(f"{note.value}-{note.octave}", end=" ")
+        print()
+
+
 
 notes = NoteSequence()
 
-newNote = Note(value="mi")
+# Test code
 
+newNote = Note(value="mi")
 notes.add(newNote)
+notes.print()
+
+for i in range(2):
+    notes.add(Note(value="re"))
+notes.print()
+notes.rotate(-2)
 notes.print()
