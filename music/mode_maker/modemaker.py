@@ -30,7 +30,27 @@
 #           - CreateModalScale(scale, mode) -> noteseq
 #           - 
 
+from dataclasses import dataclass
+from typing import List
 
+@dataclass 
+class Note():
+    value: str = None
+    octave: int = 1
 
+class NoteSequence():
+    Notes: List[Note] = []
 
+    def add(self, note: Note) -> None:
+        self.Notes.append(note)
 
+    def print(self) -> None:
+        for note in self.Notes:
+            print(note.value, note.octave)
+
+notes = NoteSequence()
+
+newNote = Note(value="mi")
+
+notes.add(newNote)
+notes.print()
