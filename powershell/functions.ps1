@@ -1,3 +1,6 @@
+
+# Files and Compression
+
 function Test-Path {
     param (
         [string] $Path
@@ -48,8 +51,21 @@ function Compress-FolderExcludeXVC($sourceDir, $destDir, $newName){
     Write-Host "Destination: $destDir\$newName.zip"
 }
 
+# AWS
+
+function Upload-FileToS3($FilePath, $BucketName, $S3KeyName) {
+    Write-Host "Attempting to upload: $path to S3"
+    
+    # Create the AWS CLI command
+    aws s3 cp $FilePath s3://$BucketName/$S3KeyName
+
+}
+
+function Sync-FromS3()
+
 
 # Test-Path -Path "C:\"
 # Ensure-PathExists -Path "C:\"
 # Compress-MyFolder -Path "C:\SomePath\SomeFolder" OR Compress-MyFolder -Path "C:\SomePath\SomeFolder" -DestinationPath "C:\SomePath\CompressedFolder.zip"
 # 
+# Upload-FileToS3 -FilePath C:\AWS\file.zip -BucketName my-bucket -S3KeyName Music/file.zip
