@@ -1,3 +1,6 @@
 
 All essential basic services for spining up a simple architecture
 - DNS Server w/ file for static IP DNS records (docker)
+
+
+Endpoint condfiguration script for Windows after clean install
