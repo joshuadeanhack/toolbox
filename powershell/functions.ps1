@@ -51,7 +51,32 @@ function Compress-FolderExcludeXVC($sourceDir, $destDir, $newName){
     Write-Host "Destination: $destDir\$newName.zip"
 }
 
+function Move-RenameFiles($sourceDir, $filePattern, $destDir, $newName, $ext){
+    $files = Get-ChildItem -Path $sourceDir -Filter $filePattern
+    foreach($file in $files){
+        $destinationFile = Join-Path -Path $destDir -ChildPath "$newName.$ext"
+        Move-Item -Path $file.FullName -Destination $destinationFile
+        Write-Host "Moving file: $($file.FullName) to $($destinationFile)"
+    }
+}
+
+function Test-EnvironmentVariable($varName){
+    $envVar = [System.Environment]::GetEnvironmentVariable($varName)
+    if ([string]::IsNullOrEmpty($envVar)){
+        Write-Output "Couldn't find environment variable '$varName' // env.$varName "
+        Exit 1
+    }
+}
+
 # AWS
+
+function Get-AWSDebugInfo(){
+    Write-Output "Debug Info..."
+    Write-Output "Windows User: $(whoami)"
+    
+    $AWSUser = aws sts get-caller-identity
+    Write-Output "AWS User: $AWSUser"
+}
 
 function Upload-FileToS3($FilePath, $BucketName, $S3KeyName) {
     Write-Host "Attempting to upload: $path to S3"
@@ -61,11 +86,29 @@ function Upload-FileToS3($FilePath, $BucketName, $S3KeyName) {
 
 }
 
-function Sync-FromS3()
+function Copy-S3BucketItem {
+    param (
+        [string]$SourceFile,
+        [string]$DestinationFile
+    )
+    Show-FileSize $SourceFile
+    Write-Host "Coping to $DestinationFile"
+    aws s3 cp $SourceFile $DestinationFile --no-progress
+}
+
+function Sync-FromS3() {
+
+}
+
 
 
 # Test-Path -Path "C:\"
 # Ensure-PathExists -Path "C:\"
 # Compress-MyFolder -Path "C:\SomePath\SomeFolder" OR Compress-MyFolder -Path "C:\SomePath\SomeFolder" -DestinationPath "C:\SomePath\CompressedFolder.zip"
+# Move-RenameFiles $sourceDir "*filename*.jpg" $destDir $newName "jpg"
+# Test-EnvironmentVariable "VariableName"
 # 
+# 
+# Get-AWSDebugInfo
 # Upload-FileToS3 -FilePath C:\AWS\file.zip -BucketName my-bucket -S3KeyName Music/file.zip
+# Copy-S3BucketItem -SourceFile $FilePath -DestinationFile $S3DestinationPath <- (in format s3://bucket/file)
