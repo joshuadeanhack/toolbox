@@ -146,6 +146,31 @@ function DownloadAndInstall {
     Start-Process -FilePath $output -Wait -Passthru
 }
 
+function Set-LondonTimeZone {
+    # Get the time zone corresponding to GMT (Greenwich Mean Time)
+    $targetTimeZone = Get-TimeZone -Id "GMT Standard Time"
+
+    # Set the time zone to the desired time zone (GMT/London)
+    Set-TimeZone -Id $targetTimeZone.Id
+
+    # Synchronize the time with the time server
+    Start-Process -FilePath "w32tm.exe" -ArgumentList "/resync" -NoNewWindow -Wait
+}
+
+function Set-RegistryValue {
+    param (
+        [string]$KeyPath,
+        [string]$ValueName,
+        [string]$ValueData,
+        [string]$ValueKind
+    )
+    $key = Get-Item -LiteralPath $KeyPath -ErrorAction SilentlyContinue
+    if ($key -eq $null) {
+        $key = New-Item -Path $KeyPath -Force
+    }
+    Set-ItemProperty -Path $KeyPath -Name $ValueName -Value $ValueData -Type $ValueKind
+}
+
 Remove-PasswordComplexityPolicy
 Set-UserPassword "Administrator" "Default-Password"
 Set-WindowsFirewallExclusion -Path "C:\MyPrograms"
@@ -156,3 +181,8 @@ Install-WSL2
 Install-UbuntuWSL -DistroName "Ubuntu" -DownloadURL "https://aka.ms/wslubuntu2204"
 Install-Choco
 DownloadAndInstall "https://cdn.unrealengine.com/CrossToolchain_Linux/v21_clang-15.0.1-centos7.exe" "C:\temp\v21_clang-15.0.1-centos7.exe"
+Set-LondonTimeZone
+# Set Windows Explorer to Show hidden files
+Set-RegistryValue -KeyPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -ValueName "Hidden" -ValueData "1" -ValueKind "DWORD"
+# Set Windows Explorer to show known file types
+Set-RegistryValue -KeyPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -ValueName "HideFileExt" -ValueData "0" -ValueKind "DWORD"
