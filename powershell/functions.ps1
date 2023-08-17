@@ -1,5 +1,6 @@
 
 # Files and Compression
+# =====================
 
 function Test-Path {
     param (
@@ -68,7 +69,42 @@ function Test-EnvironmentVariable($varName){
     }
 }
 
+# Create a .backup of a given file
+function PreserveFile {
+    param (
+        [string] $FilePath
+    )
+
+    Write-Host "Attempting to backup file as: $backupFileName"
+
+    $backupFileName = "$FilePath.backup"
+    Copy-Item -Path $FilePath -Destination $backupFileName -Force
+}
+
+# Restore a .backup file
+function RestoreFile {
+    param (
+        [string] $BackupFilePath
+    )
+
+    if (-not $BackupFilePath.EndsWith(".backup")) {
+        Write-Error "Provided file is not a backup. Ensure it has a .backup extension."
+        return
+    }
+
+    $originalFileName = $BackupFilePath.TrimEnd('.backup')
+
+    # Override the current config.vdf
+    Write-Host "Attempting to restore file..."
+    Write-Host "Copying $BackupFilePath to: $originalFileName"
+
+    Copy-Item -Path $BackupFilePath -Destination $originalFileName -Force
+}
+
+
+# ====
 # AWS
+# ====
 
 function Get-AWSDebugInfo(){
     Write-Output "Debug Info..."
@@ -97,18 +133,34 @@ function Copy-S3BucketItem {
 }
 
 function Sync-FromS3() {
+    param (
+        [string] $S3Folder,
+        [string] $DestinationFolder,
+        [string] $FileName
+    )
+
+    Write-Host "Copying $S3Location to $DestinationPath"
+    aws s3 sync $S3Folder $DestinationFolder --exclude "*" --include $FileName
 
 }
 
+# ---------------
+# Commands in use
+# ---------------
 
+# Filesystem
 
 # Test-Path -Path "C:\"
 # Ensure-PathExists -Path "C:\"
-# Compress-MyFolder -Path "C:\SomePath\SomeFolder" OR Compress-MyFolder -Path "C:\SomePath\SomeFolder" -DestinationPath "C:\SomePath\CompressedFolder.zip"
+# Compress-Folder -Path "C:\SomePath\SomeFolder" OR Compress-MyFolder -Path "C:\SomePath\SomeFolder" -DestinationPath "C:\SomePath\CompressedFolder.zip"
 # Move-RenameFiles $sourceDir "*filename*.jpg" $destDir $newName "jpg"
 # Test-EnvironmentVariable "VariableName"
-# 
-# 
+# PreserveFile -FilePath "C:\myfile.config"
+# RestoreFile -BackupFilePath "C:\myfile.config.backup"
+
+# AWS
+
 # Get-AWSDebugInfo
 # Upload-FileToS3 -FilePath C:\AWS\file.zip -BucketName my-bucket -S3KeyName Music/file.zip
 # Copy-S3BucketItem -SourceFile $FilePath -DestinationFile $S3DestinationPath <- (in format s3://bucket/file)
+# Sync-FromS3 -FileName "*.iso" -S3Folder "s3:/bucket/images"  -DestinationFolder "C:\"
