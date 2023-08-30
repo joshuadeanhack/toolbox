@@ -1,0 +1,18 @@
+Tools:
+
+7Zip
+ImgBurn
+
+
+
+Use 7Zip to extract a Windows ISO,
+
+Use ImgBurn to repackage a new ISO
+	Bootable Settings:
+	UDF 1.02
+	Advanced > Bootable Disk > Make Image Bootable
+		Emulation Type: None
+		Boot Image: windows_image/boot/etfsboot.com
+		Load Segment: 07C0
+		Sectors: 8
+	Burn

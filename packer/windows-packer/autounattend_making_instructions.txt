@@ -1,0 +1,23 @@
+
+--- Making an AutoUnattend File ---
+
+Guide: https://www.techtarget.com/searchenterprisedesktop/definition/Microsoft-Windows-System-Image-Manager-SIM
+
+Packer Guide:
+https://www.virtualizationhowto.com/2021/06/automated-windows-server-2022-packer-build/
+
+1. Grab the DISM tool from the ADK
+
+https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install
+
+Download the ADK and install, ticking the Deployment Tools Option
+
+2. Open Windows System Image Manager (SIM)
+
+3. Extract Windows ISO to folder with 7Zip, then in SIM goto File > Select Windows Image
+
+Find the install.wim file in the ISO folder sources/install.wim
+
+4. In SIM, File > New Answer File
+
+...
