@@ -2,7 +2,7 @@
 # Files and Compression
 # =====================
 
-function Test-Path {
+function TestPathExists {
     param (
         [string] $Path
     )
@@ -101,6 +101,32 @@ function RestoreFile {
     Copy-Item -Path $BackupFilePath -Destination $originalFileName -Force
 }
 
+# Look for entries in a JSON file
+function LookForJSON {
+    param (
+        [string] $FilePath,
+        [string] $Block1,
+        [string] $Block2
+    )
+
+    # Read the file and parse the JSON
+    $json = Get-Content -Path $JsonFilePath | ConvertFrom-Json -AsHashTable
+
+    # Example of nested levels:
+    # Check for the "Authentication" block and "RememberedMachineID" block
+    # if ($json.InstallConfigStore.Authentication -and $json.InstallConfigStore.Authentication.RememberedMachineID)
+    
+    if ($json.$($Block1)-and $json.$($Block2)) {
+        Write-Output "Both '$Block1' and '$Block2' blocks exist in the JSON file: $FilePath"
+        return $true
+    }
+    else {
+        Write-Output "The required blocks do not exist in the JSON file: $FilePath"
+        return $false
+    }
+
+}
+
 
 # ====
 # AWS
@@ -150,13 +176,14 @@ function Sync-FromS3() {
 
 # Filesystem
 
-# Test-Path -Path "C:\"
+# TestPathExists -Path "C:\"
 # Ensure-PathExists -Path "C:\"
 # Compress-Folder -Path "C:\SomePath\SomeFolder" OR Compress-MyFolder -Path "C:\SomePath\SomeFolder" -DestinationPath "C:\SomePath\CompressedFolder.zip"
 # Move-RenameFiles $sourceDir "*filename*.jpg" $destDir $newName "jpg"
 # Test-EnvironmentVariable "VariableName"
 # PreserveFile -FilePath "C:\myfile.config"
 # RestoreFile -BackupFilePath "C:\myfile.config.backup"
+# LookForJSON -FilePath "C:\myfile.json" -Block1 "Configuration" -Block2 "SomeOtherTopLevelBLockName"  <-- modify this function based on what you want to find
 
 # AWS
 

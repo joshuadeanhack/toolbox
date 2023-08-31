@@ -92,9 +92,15 @@ function Install-UbuntuWSL {
 }
 
 function Install-Choco {
-    Set-ExecutionPolicy Bypass -Scope Process -Force
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    try{ 
+        choco --version
+    }
+    catch {
+        Write-Host "Choco Not Found, Installing...."
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    }
 }
 
 function EnsureDirectoryExists {
@@ -171,6 +177,46 @@ function Set-RegistryValue {
     Set-ItemProperty -Path $KeyPath -Name $ValueName -Value $ValueData -Type $ValueKind
 }
 
+function Configure-OpenSSH {
+    param(
+        [string] $ConfigFilePath = "C:\Program Files\OpenSSH-Win64\sshd_config_default"
+    )
+
+    # Check if the specified file exists
+    if (-not (Test-Path -Path $ConfigFilePath -PathType Leaf)) {
+        Write-Host "Error: $ConfigFilePath does not exist."
+        return
+    }
+
+    #Run install script
+    Set-ExecutionPolicy Bypass
+    & "C:\Program Files\OpenSSH-Win64\install-sshd.ps1"
+
+    # Enable root login and password authentication
+    $configLines = Get-Content -Path $ConfigFilePath
+    $newConfig = @()
+    foreach ($line in $configLines) {
+        if ($line -match "^#?PermitRootLogin") {
+            $newConfig += "PermitRootLogin yes"
+        } elseif ($line -match "^#?PasswordAuthentication") {
+            $newConfig += "PasswordAuthentication yes"
+        } else {
+            $newConfig += $line
+        }
+    }
+
+    # Write updated configuration back to file
+    $newConfig | Set-Content -Path $ConfigFilePath -encoding UTF8
+    Write-Host "OpenSSH configuration file updated."
+}
+
+function Set-OpenSSHServiceAutoStart {
+    Set-Service -Name sshd -StartupType Automatic
+    Write-Host "OpenSSH service set to start automatically."
+}
+
+
+
 Remove-PasswordComplexityPolicy
 Set-UserPassword "Administrator" "Default-Password"
 Set-WindowsFirewallExclusion -Path "C:\MyPrograms"
@@ -186,3 +232,7 @@ Set-LondonTimeZone
 Set-RegistryValue -KeyPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -ValueName "Hidden" -ValueData "1" -ValueKind "DWORD"
 # Set Windows Explorer to show known file types
 Set-RegistryValue -KeyPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -ValueName "HideFileExt" -ValueData "0" -ValueKind "DWORD"
+
+choco install -y openssh
+Configure-OpenSSH
+Set-OpenSSHServiceAutoStart
