@@ -103,7 +103,7 @@ https://github.com/StefanScherer/packer-windows/blob/main/answer_files/2022/Auto
             <UserData>
                 <AcceptEula>true</AcceptEula>
                 <FullName>Administrator</FullName>
-                <Organization>ThirdKindGames</Organization>
+                <Organization>LS</Organization>
                 <ProductKey>
                     <Key></Key>
                     <WillShowUI>OnError</WillShowUI>

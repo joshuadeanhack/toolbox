@@ -52,8 +52,8 @@
             </AutoLogon>
             <BluetoothTaskbarIconEnabled>false</BluetoothTaskbarIconEnabled>
             <TimeZone>UTC</TimeZone>
-            <RegisteredOrganization>ThirddKindGamess</RegisteredOrganization>
-            <RegisteredOwner>Darren</RegisteredOwner>
+            <RegisteredOrganization>LS</RegisteredOrganization>
+            <RegisteredOwner>joshdeanhack</RegisteredOwner>
         </component>
     </settings>
 </unattend>
