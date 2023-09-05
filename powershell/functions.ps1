@@ -128,6 +128,16 @@ function LookForJSON {
 }
 
 
+# ===========
+# Networking
+# ===========
+
+function Get-MachineIP {
+    $IPObject = Get-NetIPAddress -AddressFamily IPv4 -PrefixLength 24 | Select-Object IPAddress
+    return $IPObject.IPAddress
+}
+
+
 # ====
 # AWS
 # ====
@@ -184,6 +194,10 @@ function Sync-FromS3() {
 # PreserveFile -FilePath "C:\myfile.config"
 # RestoreFile -BackupFilePath "C:\myfile.config.backup"
 # LookForJSON -FilePath "C:\myfile.json" -Block1 "Configuration" -Block2 "SomeOtherTopLevelBLockName"  <-- modify this function based on what you want to find
+
+# Networking
+# Get-MachineIP
+
 
 # AWS
 
