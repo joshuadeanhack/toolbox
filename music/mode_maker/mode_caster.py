@@ -70,10 +70,9 @@ class NoteSequence():
         print()
 
 
+# Test code
 
 notes = NoteSequence()
-
-# Test code
 
 newNote = Note(value="mi")
 notes.add(newNote)
@@ -84,3 +83,21 @@ for i in range(2):
 notes.print()
 notes.rotate(-2)
 notes.print()
+
+
+# Modify notes of a scale based on the mode modifier
+def CreateModalScale(scale: dict, mode: dict) -> dict:
+    # Loop through each value in the scale and mode at the same time
+    for (k1, v1), (k2, v2) in zip(scale.items(), mode.items()):
+        print(f"Scale {k1}: {v1} Mode {k2}: {v2}")
+    
+    # Add condition and function call here that modifies the note semi-tone based on v2
+
+    # Return the new modalscale as dict - { solfa: absolute_note }
+
+# Function to change an absolute note based on number of semi-tones changed
+
+# Static data Note Order...
+
+# Function to load a note sequence and a modalscale dict - generates a new NoteSeq 
+# Loop -> new_note.value = modalscale[solfa_note.value] 
