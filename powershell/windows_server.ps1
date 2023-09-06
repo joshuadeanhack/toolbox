@@ -61,7 +61,7 @@ function Set-DHCPOption {
         [string] $DomainToAddRecord
     )
     Write-Host "Setting DHCP Options: Router=$ScopeIP DNS Server=$DNSServer Domain=$DomainToAddRecord"
-    Set-DhcpServerv4OptionValue -ScopeId $ScopeIP -DnsServer $DNSServer -DnsDomain $DomainToAddRecord -Router $RouterIP 
+    Set-DhcpServerv4OptionValue -ScopeId $ScopeIP -DnsServer $DNSServer -DnsDomain $DomainToAddRecord -Router $RouterIP -Force # Use -Force to skip validation
 }
 
 function Get-ScopeOptions {
@@ -103,7 +103,7 @@ if ([string]::IsNullOrEmpty($env:DNSServerIP)){
     $MachineIP = Get-MachineIP
 }
 else {
-    $MachineIP = $env:DNSServerIP
+    $MachineIP = [ipaddress]$env:DNSServerIP.Trim()
 }
 
 #Set Options
