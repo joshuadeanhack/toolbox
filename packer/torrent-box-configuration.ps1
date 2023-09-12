@@ -1,48 +1,3 @@
-# This script is run by all windows packer provisioners, elevated to Administrator
-# It sets a default password for the machine and sets up basic windows configuration
-#
-# Dependancies:
-#    $env:SetAdminPassword environment variable needs to be set
-#
-
-# Fumction to test an environment variable exists at runtime
-function Test-EnvironmentVariable($varName){
-    $envVar = [System.Environment]::GetEnvironmentVariable($varName)
-    if ([string]::IsNullOrEmpty($envVar)){
-        Write-Output "Couldn't find environment variable '$varName' // env.$varName "
-        Exit 1
-    }
-}
-
-# Function to remove password complexity requirements of users
-function Remove-PasswordComplexityPolicy {
-    # Export current security policy
-    secedit /export /cfg c:\secpol.cfg
-
-    # Replace the value in the file
-    (Get-Content C:\secpol.cfg).replace("PasswordComplexity = 1", "PasswordComplexity = 0") | Out-File C:\secpol.cfg
-
-    # Import new security policy file
-    secedit /configure /db c:\windows\security\local.sdb /cfg c:\secpol.cfg /areas SECURITYPOLICY
-
-    # Cleanup Secpol cfg file
-    Remove-Item -force c:\secpol.cfg -confirm:$false
-}
-
-function Set-UserPassword {
-	param (
-        [string]$Username,
-        [string]$Password
-    )
-    # Set Adminstrator Default Password
-    Write-Host "Setting Password for: $Username"
-    net user $Username $Password
-
-    # Set the password to never expire
-    Write-Host "Setting password to never expire"
-    wmic useraccount where "name='$Username'" set PasswordExpires=FALSE
-}
-
 # Function to open an inbound port on windows firewall
 function Open-FirewallPort {
     param (
@@ -53,7 +8,10 @@ function Open-FirewallPort {
     New-NetFirewallRule -DisplayName "Open Port $PortNumber - $Protocol" -Direction Inbound -LocalPort $PortNumber -Protocol $Protocol -Action Allow
 }
 
-function Set-TimeZone {
+function Set-LondonTimeZone {
+
+    Write-Host "Setting Timezone"
+
     # Get the time zone corresponding to GMT (Greenwich Mean Time)
     $targetTimeZone = Get-TimeZone -Id "GMT Standard Time"
 
@@ -61,7 +19,9 @@ function Set-TimeZone {
     Set-TimeZone -Id $targetTimeZone.Id
 
     # Synchronize the time with the time server
-    Start-Process -FilePath "w32tm.exe" -ArgumentList "/resync" -NoNewWindow -Wait
+    Start-Process -FilePath "w32tm.exe" -ArgumentList "/resync" -NoNewWindow
+
+    Write-Host "Timezone set to: $targetTimeZone"
 }
 
 # Function to modify registry values
@@ -84,6 +44,7 @@ function Disable-UAC {
 }
 
 function Disable-Telemetry {
+    Write-Host "Disabling Telemetry..."
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowDeviceNameInTelemetry" -Type DWord -Value 0
     Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Type DWord -Value 0
@@ -100,22 +61,12 @@ function Install-Choco {
 }
 
 try {
-    # Make sure the admin password is set
-    Test-EnvironmentVariable "SetAdminPassword"
-
-    Write-Host "Removing password complexity policy"
-    Remove-PasswordComplexityPolicy
-
-    # Set Adminstrator Default Password
-    Write-Host "Setting admin password"
-    Set-UserPassword -Username Administrator -Password $env:SetAdminPassword
-
     # Open Management Ports - RDP
     Open-FirewallPort -Port 3389 -Protocol TCP
     Open-FirewallPort -Port 3389 -Protocol UDP 
 
     # Set Time to London
-    Set-TimeZone
+    Set-LondonTimeZone
 
     # Set Windows Explorer to Show hidden files
     Set-RegistryValue -KeyPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -ValueName "Hidden" -ValueData "1" -ValueKind "DWORD"
@@ -129,12 +80,10 @@ try {
 
     Install-Choco
 
-    choco install qbittorrent
+    choco install -y qbittorrent --no-progress
 
 }
 catch {
     Write-Host "Provisioning Error: "
     Write-Host $_
 }
-
-
