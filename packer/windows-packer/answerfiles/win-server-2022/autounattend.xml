@@ -172,8 +172,8 @@
                 <Username>Administrator</Username>
             </AutoLogon>
             <TimeZone>GMT Standard Time</TimeZone>
-            <RegisteredOrganization>ThirddKindGamess</RegisteredOrganization>
-            <RegisteredOwner>Darren</RegisteredOwner>
+            <RegisteredOrganization>Lightfire Studios</RegisteredOrganization>
+            <RegisteredOwner>Emerald</RegisteredOwner>
             
             <!-- 
                 Run the WinRM powershell script that packer adds to the DVD files as the E drive
