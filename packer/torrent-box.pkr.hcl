@@ -64,7 +64,7 @@ source "amazon-ebs" "windows2022" {
   # This user data file sets up winrm and configures it so that the connection
   # from Packer is allowed. Without this file being set, Packer will not
   # connect to the instance.
-  user_data_file = "./windows-packer/winrm_bootstrap.txt"
+  user_data_file = "./windows-packer/scripts/winrm_bootstrap.txt"
 
   # Add AMI Tags
   tags = {
