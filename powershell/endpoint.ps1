@@ -107,6 +107,8 @@ try {
     choco install dive --% --ia INSTALLDIR="c:\tools\dive"
     choco install yt-dlp --% --ia INSTALLDIR="c:\tools\yt-dlp"
     choco install ventoy --% --ia INSTALLDIR="c:\tools\ventoy"
+    choco install rdm
+    choco install iperf3
     choco install awscli 
     # Get-iplayer
     Ensure-PathExists -Path "C:\tools\get-iplayer"
