@@ -1,6 +1,15 @@
 #
-# Windows 10/11 Pro - Generic Upgrade Key: VK7JG-NPHTM-C97JM-9MPGT-3V66T 
+# Generic Upgrade Keys:
+# Windows 10/11 Home - YTMG3-N6DKC-DKB77-7M9GH-8HVX7
+# Windows 10/11 Pro -  VK7JG-NPHTM-C97JM-9MPGT-3V66T 
+# Windows 10/11 Enterprise - XGVPP-NMH47-7TTHJ-W3FW7-8HV2C
+# Windows 10/11 Education - YNMGQ-8RYV3-4PGQ3-C8XTP-7CFBY	
 #
+# Generic Product Keys:
+# Win 10 Pro:
+# 1. NF6HC-QH89W-F8WYV-WWXV4-WFG6P
+# 2. RHGJR-N7FVY-Q3B8F-KBQ6V-46YP4
+
 
 function Install-Choco {
     try{ 
@@ -48,6 +57,20 @@ function Ensure-PathExists {
     }
 }
 
+function EnsureDirectoryExists {
+    param (
+        [string]$filePath
+    )
+
+    $directoryPath = Split-Path $filePath -Parent
+
+    if (-not (Test-Path $directoryPath)) {
+        # Recursivly create the directory
+        Write-Output "Creating Directory: $directoryPath"
+        New-Item -ItemType Directory -Force -Path $directoryPath
+    }
+}
+
 function DownloadAndInstall {
     param (
         [string]$url,
@@ -69,17 +92,32 @@ function DownloadAndInstall {
     Start-Process -FilePath $output -Wait -Passthru
 }
 
+#
+# Set these options to what you want to have installed 
+#
+
+$INSTALL_CREATIVE_TOOLS = $true
+$INSTALL_WSL = $false
+$INSTALL_DEV_TOOLS = $false
 
 
+# ====
 # Main
+# ====
 
 try {
+
     Disable-UAC
     Disable-Telemetry
+
     # Set Windows Explorer to Show hidden files
     Set-RegistryValue -KeyPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -ValueName "Hidden" -ValueData "1" -ValueKind "DWORD"
     # Set Windows Explorer to show known file types
     Set-RegistryValue -KeyPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -ValueName "HideFileExt" -ValueData "0" -ValueKind "DWORD"
+
+    if ($INSTALL_WSL) {
+        Install-WSL2
+    }
 
 }
 catch {
@@ -104,16 +142,17 @@ try {
     Write-Host "Installing Tools"
     $env:ChocoToolsLocation = "C:\tools"
     choco install cmder
-    choco install dive --% --ia INSTALLDIR="c:\tools\dive"
-    choco install yt-dlp --% --ia INSTALLDIR="c:\tools\yt-dlp"
-    choco install ventoy --% --ia INSTALLDIR="c:\tools\ventoy"
+    choco install dive 
+    choco install yt-dlp 
+    choco install ventoy
     choco install rdm
     choco install iperf3
-    choco install awscli 
+    choco install awscli
+
     # Get-iplayer
     Ensure-PathExists -Path "C:\tools\get-iplayer"
     DownloadAndInstall -url https://github.com/get-iplayer/get_iplayer_win32/releases/download/3.34.0/get_iplayer-3.34.0-windows-x64-setup.exe -output "C:/tools/get-iplayer/get_iplayer-3.34.0-windows-x64-setup.exe"
-    Install-WSL2
+    
 }
 catch {
     Write-Host "Error Installing Tools: "
@@ -121,14 +160,38 @@ catch {
 }
 
 try {
-    Write-Host "Installing Creative:"
-    choco install blender
-    choco install krita
+    if ($INSTALL_CREATIVE_TOOLS) {
+        Write-Host "Installing Creative Tools:"
+        choco install blender
+        choco install krita
+        choco install vlc
+    }
+    # Behringer UMC Drivers Packge from GoogleDrive:Software/
 }
 catch {
     Write-Host "Error Installing Creative: "
     Write-Host $_
 }
 
+try {
+    if ($INSTALL_DEV_TOOLS) {
+        Write-Host "Installing Dev Tools:"
+        choco install docker-desktop
+        choco install vscode
+        choco install github-desktop
+        choco install notepadplusplus
+    }
+}
+catch {
+    Write-Host "Error Installing Creative: "
+    Write-Host $_
+}
+
+
+Write-Host "Ensuring Stability..."
+
 sfc /scannow
 dism /Online /Cleanup-Image /RestoreHealth
+
+# Run $>chkdsk C: /r
+# if needed
