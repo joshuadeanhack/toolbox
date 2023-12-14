@@ -10,6 +10,14 @@
 # 1. NF6HC-QH89W-F8WYV-WWXV4-WFG6P
 # 2. RHGJR-N7FVY-Q3B8F-KBQ6V-46YP4
 
+#
+# Set these options to what you want to have installed 
+#
+
+$INSTALL_CREATIVE_TOOLS = $true
+$INSTALL_WSL = $false
+$INSTALL_DEV_TOOLS = $false
+
 
 function Install-Choco {
     try{ 
@@ -91,14 +99,6 @@ function DownloadAndInstall {
     Write-Output "Running Installer - Manual Install - Please Configure"
     Start-Process -FilePath $output -Wait -Passthru
 }
-
-#
-# Set these options to what you want to have installed 
-#
-
-$INSTALL_CREATIVE_TOOLS = $true
-$INSTALL_WSL = $false
-$INSTALL_DEV_TOOLS = $false
 
 
 # ====
