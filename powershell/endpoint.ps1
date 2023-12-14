@@ -10,9 +10,10 @@
 # 1. NF6HC-QH89W-F8WYV-WWXV4-WFG6P
 # 2. RHGJR-N7FVY-Q3B8F-KBQ6V-46YP4
 
-#
-# Set these options to what you want to have installed 
-#
+# ----------------------------------------------------
+# Set these options to what you want to have installed
+# ----------------------------------------------------
+
 
 $INSTALL_CREATIVE_TOOLS = $true
 $INSTALL_WSL = $false
@@ -44,6 +45,20 @@ function Disable-Telemetry {
     
     Get-Service -Name "DiagTrack" | Stop-Service -NoWait -Force
     Get-Service -Name "DiagTrack" | set-service -StartupType Disabled
+}
+
+function Set-RegistryValue {
+    param (
+        [string]$KeyPath,
+        [string]$ValueName,
+        [string]$ValueData,
+        [string]$ValueKind
+    )
+    $key = Get-Item -LiteralPath $KeyPath -ErrorAction SilentlyContinue
+    if ($key -eq $null) {
+        $key = New-Item -Path $KeyPath -Force
+    }
+    Set-ItemProperty -Path $KeyPath -Name $ValueName -Value $ValueData -Type $ValueKind
 }
 
 function Install-WSL2 {
@@ -141,13 +156,9 @@ catch {
 try {
     Write-Host "Installing Tools"
     $env:ChocoToolsLocation = "C:\tools"
-    choco install cmder
-    choco install dive 
-    choco install yt-dlp 
-    choco install ventoy
     choco install rdm
-    choco install iperf3
     choco install awscli
+    choco install yt-dlp 
 
     # Get-iplayer
     Ensure-PathExists -Path "C:\tools\get-iplayer"
@@ -165,8 +176,11 @@ try {
         choco install blender
         choco install krita
         choco install vlc
+
+        # Add: Behringer UMC Drivers Packge from GoogleDrive:Software/
+        # Add: Reaper and Audio Plugins
     }
-    # Behringer UMC Drivers Packge from GoogleDrive:Software/
+    
 }
 catch {
     Write-Host "Error Installing Creative: "
@@ -176,14 +190,18 @@ catch {
 try {
     if ($INSTALL_DEV_TOOLS) {
         Write-Host "Installing Dev Tools:"
+        choco install cmder
         choco install docker-desktop
+        choco install dive
         choco install vscode
         choco install github-desktop
         choco install notepadplusplus
+        choco install iperf3
+        choco install ventoy
     }
 }
 catch {
-    Write-Host "Error Installing Creative: "
+    Write-Host "Error Installing Dev Tools: "
     Write-Host $_
 }
 
