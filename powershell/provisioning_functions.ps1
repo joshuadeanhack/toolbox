@@ -215,6 +215,13 @@ function Set-OpenSSHServiceAutoStart {
     Write-Host "OpenSSH service set to start automatically."
 }
 
+function Set-FolderExclusion {
+    param (
+        [string] $Path
+    )
+    Set-MpPreference -ExclusionPath $Path
+}
+
 
 
 Remove-PasswordComplexityPolicy
@@ -236,3 +243,5 @@ Set-RegistryValue -KeyPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Expl
 choco install -y openssh
 Configure-OpenSSH
 Set-OpenSSHServiceAutoStart
+
+Set-FolderExclusion -Path "C:\testfolder"
