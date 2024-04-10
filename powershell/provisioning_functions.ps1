@@ -47,7 +47,7 @@ function Open-FirewallPort {
         [string] $Protocol
     )
     Write-Host "Opening Windows Firewall Port: $Port $Protocol"
-    New-NetFirewallRule -DisplayName "Open Port $PortNumber - $Protocol" -Direction Inbound -LocalPort $PortNumber -Protocol $Protocol -Action Allow
+    New-NetFirewallRule -DisplayName "Open Port $Port - $Protocol" -Direction Inbound -LocalPort $Port -Protocol $Protocol -Action Allow
 }
 
 function Disable-UAC {
@@ -224,6 +224,13 @@ function Set-OpenSSHServiceAutoStart {
     Write-Host "OpenSSH service set to start automatically."
 }
 
+function Set-FolderExclusion {
+    param (
+        [string] $Path
+    )
+    Set-MpPreference -ExclusionPath $Path
+}
+
 
 
 Remove-PasswordComplexityPolicy
@@ -246,3 +253,5 @@ Set-RegistryValue -KeyPath "HKCU:\Software\Microsoft\Windows\CurrentVersion\Expl
 choco install -y openssh
 Configure-OpenSSH
 Set-OpenSSHServiceAutoStart
+
+Set-FolderExclusion -Path "C:\testfolder"

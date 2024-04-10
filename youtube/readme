@@ -1,8 +1,0 @@
-
-Dependancies:
-yt-dlp.exe installed and accessible through the system path
-
-
-print_playlist.py - print the info of a playlist 
-
-select_videos.py - an interactive tool that allows you to choose which videos to keep and loose
