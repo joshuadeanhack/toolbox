@@ -24,6 +24,15 @@ function Set-UserPassword {
     wmic useraccount where "name='$Username'" set PasswordExpires=FALSE
 }
 
+function Add-UserToRDPGroup {
+    param (
+        [string] $Username
+    )
+    # Azure AD Example
+    # Add-LocalGroupMember -Group "Remote Desktop Users" -Member "AzureAD\josh.dean@thirdkindgames.com"
+    Add-LocalGroupMember -Group "Remote Desktop Users" -Member $Username    
+}
+
 function Set-WindowsFirewallExclusion {
     param (
         [string] $Path
@@ -219,6 +228,7 @@ function Set-OpenSSHServiceAutoStart {
 
 Remove-PasswordComplexityPolicy
 Set-UserPassword "Administrator" "Default-Password"
+Add-UserToRDPGroup -Username "josh.dean@thirdkindgames.com"
 Set-WindowsFirewallExclusion -Path "C:\MyPrograms"
 Open-FirewallPort -Port 3389 -Protocol UDP
 Disable-UAC
